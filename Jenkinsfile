@@ -1,0 +1,43 @@
+pipeline {
+  agent{
+    docker{
+      image 'indeshwar/docker-maven'
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+    }
+
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        sh 'echo passed'
+        //git branch: 'main', url: 'https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero.git'
+      }
+    }
+    stage('Build'){
+      steps{
+        sh 'mvn clean package'
+      }
+    }
+
+    stage('Build Docker image'){
+        steps{
+            script{
+                sh 'docker build -t kaflep/myapp:3 .'
+
+            }
+        }
+    }
+
+    stage("Push docker image to Dockerhub"){
+        steps{
+            script{
+                withCredentials([string(credentialsId: 'kaflep', variable: 'Dockerpwd')]) {
+                    sh 'docker login -u kaflep -p ${Dockerpwd}'
+                    sh 'docker push kaflep/myapp:3'
+                }
+
+            }
+        }
+    }
+  }
+}
