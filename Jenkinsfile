@@ -22,7 +22,7 @@ pipeline {
     stage('Build Docker image'){
         steps{
             script{
-                sh 'docker build -t kaflep/myapp:3 .'
+                sh 'docker build -t kaflep/demo .'
 
             }
         }
@@ -33,7 +33,7 @@ pipeline {
             script{
                 withCredentials([string(credentialsId: 'kaflep', variable: 'Dockerpwd')]) {
                     sh 'docker login -u kaflep -p ${Dockerpwd}'
-                    sh 'docker push kaflep/myapp:3'
+                    sh 'docker push kaflep/demo'
                 }
 
             }
